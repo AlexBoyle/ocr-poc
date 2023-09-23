@@ -11,6 +11,7 @@ def find_conturs(ogImage):
 
     Returns None if no contours were found
     """
+    #ogImage = cv2.resize(ogImage, (0, 0), fx = 3, fy = 3, interpolation = cv2.INTER_LINEAR )
     image = ogImage.copy()
     
     # add border
@@ -39,16 +40,19 @@ def find_conturs(ogImage):
     out = np.zeros_like(mask)
     out[mask == 255] = ogImage1[mask == 255]
     cv2.imwrite("./output/mask.jpg", mask)
+    cv2.imwrite("./output/mask1.jpg", out)
     
     #crop
-    leeway = 30
-    gray = cv2.cvtColor(out,cv2.COLOR_BGR2GRAY)
+    leeway = 0
+    gray = cv2.cvtColor(mask,cv2.COLOR_BGR2GRAY)
     _,thresh = cv2.threshold(gray,1,255,cv2.THRESH_BINARY)
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     cnt = contours[0]
     x,y,w,h = cv2.boundingRect(cnt)
-    out = img[y-leeway:y+h+leeway,x-leeway:x+w+leeway]
+    #cv2.imwrite('./output/temp.jpg',temp)
+    out = out[y:y+h,x:x+w]
     cv2.imwrite('./output/crop.jpg',out)
+    
     
     #reduce noise
     out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
