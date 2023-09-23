@@ -15,7 +15,7 @@ RUN mkdir /main
 
 WORKDIR /main
 COPY ./src .
-RUN mkdir ./output
+
 
 
 

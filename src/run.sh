@@ -1,7 +1,4 @@
 #! /bin/bash
 
-
-
-
-./parse.sh ./images/1065-receipt.jpg
+tesseract --print-parameters
 python3 server.py
