@@ -11,45 +11,38 @@ def find_conturs(ogImage):
 
     Returns None if no contours were found
     """
-    #ogImage = cv2.resize(ogImage, (0, 0), fx = 3, fy = 3, interpolation = cv2.INTER_LINEAR )
+   
     image = ogImage.copy()
     
     # add border
     image = cv2.copyMakeBorder(image, 100, 100, 100, 100, cv2.BORDER_CONSTANT, None, [0,0,0,0])
-    ogImage1 = cv2.copyMakeBorder(ogImage, 100, 100, 100, 100, cv2.BORDER_CONSTANT, None, [0,0,0,0])
-    cv2.imwrite("./output/inital.jpg", ogImage1)
+    cv2.imwrite("./output/init.jpg", image)
+
 
     #try to cut out non-important parts
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    image = cv2.threshold(image, 100, 255, cv2.THRESH_BINARY)[1]
-    image = cv2.dilate(image, np.ones((20, 20), np.uint8))
-    cv2.imwrite("./output/test.jpg", image)
-    contours, _ = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE )
+    Mimage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite("./output/g.jpg", Mimage)
+    Mimage = cv2.threshold(Mimage, 150, 255, cv2.THRESH_BINARY)[1]
+    contours, _ = cv2.findContours(Mimage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE )
+
+    cv2.imwrite("./output/Mimage.jpg", Mimage)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
-    receipt_contour = None
-    for contour in contours:
-        perimeter = cv2.arcLength(contour, True)
-        approx_curve = cv2.approxPolyDP(contour, 0.05 * perimeter, True)
-        if len(approx_curve) == 4:
-            receipt_contour = approx_curve
-            break
-            
+    temp = cv2.drawContours(image=image, contours=contours, contourIdx=0, color=(255, 255, 0), thickness=1, lineType=cv2.LINE_AA)
+    cv2.imwrite("./output/temp.jpg", temp)
+
     #cut out targeted area
-    mask = np.zeros_like(ogImage1)
-    mask = cv2.drawContours(image=mask, contours=contours, contourIdx=0, color=(255, 255, 255), thickness=cv2.FILLED, lineType=cv2.LINE_AA)
+    mask = np.zeros_like(image)
+    mask = cv2.drawContours(image=mask, contours=contours, contourIdx=0, color=(255, 255, 255), thickness=-1, lineType=cv2.LINE_AA)
     out = np.zeros_like(mask)
-    out[mask == 255] = ogImage1[mask == 255]
+    out[mask == 255] = image[mask == 255]
     cv2.imwrite("./output/mask.jpg", mask)
-    cv2.imwrite("./output/mask1.jpg", out)
+    cv2.imwrite("./output/crop-b.jpg", out)
     
     #crop
-    leeway = 0
     gray = cv2.cvtColor(mask,cv2.COLOR_BGR2GRAY)
-    _,thresh = cv2.threshold(gray,1,255,cv2.THRESH_BINARY)
-    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    contours = cv2.findContours(gray,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[0]
     cnt = contours[0]
     x,y,w,h = cv2.boundingRect(cnt)
-    #cv2.imwrite('./output/temp.jpg',temp)
     out = out[y:y+h,x:x+w]
     cv2.imwrite('./output/crop.jpg',out)
     
