@@ -11,13 +11,17 @@ except:
     print("Cant find pytesseract")
 MAX_COLOR_VALUE = 255
 MIN_COLOR_VALUE = 0
-
+DEBUG = False
+def saveImage(img, name, compression = 100):
+    cv2.imwrite(name+".webp", img, [cv2.IMWRITE_WEBP_QUALITY, compression])
 def cutOnBrightness(ogImage):
     image = ogImage.copy()
 
     # Preprocesing for image simplification
     processedImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     avrBrightness = np.average(processedImage)
+    if avrBrightness > 175 :
+        avrBrightness = 175
     processedImage = cv2.threshold(processedImage, avrBrightness, MAX_COLOR_VALUE, cv2.THRESH_BINARY)[1]
     contours = cv2.findContours(processedImage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
     contour = sorted(contours, key=cv2.contourArea, reverse=True)[0]
@@ -53,19 +57,20 @@ def preprocess(ogImage):
     out = np.abs(np.subtract(out, 1))
     out = cv2.adaptiveThreshold(src=out, maxValue=MAX_COLOR_VALUE, adaptiveMethod=cv2.ADAPTIVE_THRESH_MEAN_C,
                                 thresholdType=cv2.THRESH_BINARY, blockSize=13, C=10)
-    cv2.imwrite("./output/final.jpg", out)
+    if DEBUG : saveImage(out, "./output/final")
+
     return out
 
 
 def process(imageName):
     output = ""
+    output1 = ""
     img = cv2.imread(imageName)
-    cv2.imwrite("./output/inital.jpg", img)
+    if DEBUG : saveImage(img, "./output/inital")
     c = preprocess(img)
     if pytesseract is not None:
         output = pytesseract.image_to_string(c, config='tessaract.conf')
     return output
-
 if __name__ == "__main__":
     print(sys.argv[1])
     process(sys.argv[1])

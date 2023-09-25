@@ -10,7 +10,7 @@ static_folder='output')
 @app.route('/check/<number>')
 def success(number):
     output = proceser.process("./images/"+ number + "-receipt.jpg")
-    return "<pre>" + output + "</pre><img src=/static/final.jpg/><img src=/static/inital.jpg/>"
+    return "<pre>" + output + "</pre><img src=/static/final.webp/><img src=/static/inital.webp/>"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
