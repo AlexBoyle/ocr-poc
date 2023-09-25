@@ -7,7 +7,8 @@ RUN apt-get install python3-pip -y
 RUN apt install libgl1-mesa-glx -y
 RUN pip install numpy
 RUN pip install opencv-python-headless
-RUN pip install flask 
+RUN pip install flask
+RUN pip install pytesseract
 RUN apt install curl -y
 
 
