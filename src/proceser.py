@@ -11,7 +11,7 @@ except:
     print("Cant find pytesseract")
 MAX_COLOR_VALUE = 255
 MIN_COLOR_VALUE = 0
-DEBUG = False
+DEBUG = True
 def saveImage(img, name, compression = 100):
     cv2.imwrite(name+".webp", img, [cv2.IMWRITE_WEBP_QUALITY, compression])
 def cutOnBrightness(ogImage):
