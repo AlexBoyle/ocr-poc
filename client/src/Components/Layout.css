@@ -1,0 +1,89 @@
+:root {
+  --header-height: 60px;
+  --panel-open: 250px;
+  --panel-closed: 50px;
+}
+header {
+  height: var(--header-height);
+  background-color: #043e5b;
+  display: flex;
+}
+panel {
+  min-height: calc(100% - var(--header-height));
+  z-index: 9999;
+  transition: 0.5s;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  max-height: calc(100% - var(--header-height));
+  background-color: white;
+  border-right: 1px solid #043e5b;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  width: var(--panel-closed);
+}
+.open {
+  width: var(--panel-open);
+}
+content {
+  box-sizing: border-box;
+  left: var(--panel-closed);
+  display: block;
+  position: relative;
+  height: calc(100% - var(--header-height));
+  transition: 0.5s;
+  width: calc(100% - var(--panel-closed));
+}
+.mainOpen {
+  left: var(--panel-open);
+  width: calc(100% - var(--panel-open));
+}
+.panelRow {
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  display: flex;
+  padding: 10px;
+  width: calc(var(--panel-open) - 20px);
+  text-align: left;
+  border-bottom: 1px solid #aaaaaa;
+}
+.panelRow:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.panelRow .icon {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+}
+.panelRow .name {
+  padding-left: 10px;
+  font-weight: 600;
+  font-size: larger;
+}
+.panelRow .icon svg {
+  height: 100%;
+  width: 100%;
+}
+
+panelButton {
+  color: white;
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  padding: 15px 10px 15px 10px;
+}
+
+panelButton .icon {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+}
+panelButton .icon svg {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+}
+a:link {
+  text-decoration: none !important;
+}

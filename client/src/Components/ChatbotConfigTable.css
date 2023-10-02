@@ -1,0 +1,27 @@
+.entryContainer {
+  border-radius: 5px;
+  border: 1px solid black;
+
+  width: 100%;
+
+  margin-top: 10px;
+  padding: 5px;
+}
+.actionButton {
+  margin: 4px !important;
+}
+.primaryActionButtonContainer {
+  flex-direction: row-reverse;
+  width: 100%;
+  display: flex;
+}
+.pageContainer {
+  width: 90%;
+  margin-left: 5%;
+}
+.textRowElement {
+  padding-top: 9px;
+}
+.rowElement {
+  border-bottom: 1px solid black;
+}
