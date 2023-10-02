@@ -48,7 +48,7 @@ def cutOnBrightness(ogImage):
 
     a = cv2.drawContours(image=processedImage.copy(), contours=[contour], contourIdx=-1,
                          color=(MAX_COLOR_VALUE, MAX_COLOR_VALUE, MIN_COLOR_VALUE), thickness=1, lineType=cv2.LINE_AA)
-    if DEBUG: saveImage(a, "./output/a")
+    #if DEBUG: saveImage(a, "./output/a")
     # Simplify bounding box
     peri = cv2.arcLength(contour, True)
     # contour = cv2.approxPolyDP(contour, .05* peri, True)
@@ -82,7 +82,7 @@ def preprocess(ogImage):
     #cv2.floodFill(out, None, (0, 0), 0)
     #cv2.floodFill(out, None, (0, 0), 255)
     # out = remove_isolated_pixels(out)
-    if DEBUG: saveImage(out, "./output/final")
+    if DEBUG: saveImage(out, "./output/preprocessedImage")
 
     return out
 
@@ -109,10 +109,10 @@ def procesing(ogImage):
         cropped = cv2.threshold(cropped, 125, MAX_COLOR_VALUE, cv2.THRESH_BINARY)[1]
         ocrOutput = ocr.runTesseract(cropped)
         if ocrOutput == "": ocrOutput = str(i)
-        saveImage(cropped, "./output/cropped-"+str(i))
+        #saveImage(cropped, "./output/cropped-"+str(i))
         wordLocation.append([x, y, str(ocrOutput)])
     wordLocation = sorted(wordLocation, key=lambda x: x[1])
-    if DEBUG: saveImage(ogImageCopy, "./output/ogImageCopy")
+    #if DEBUG: saveImage(ogImageCopy, "./output/ogImageCopy")
     diff = 0
     for i, word in enumerate(wordLocation):
         if i != 0:
@@ -127,11 +127,11 @@ def procesing(ogImage):
             for word1 in wordGrouping[-1]:
                 output = output + str.ljust(word1[2], 15) + " | "
             output = output + "\n"
-            print(wordGrouping[-1])
+            #print(wordGrouping[-1])
             wordGrouping.append([])
             currentHeight = word[1]
         wordGrouping[-1].append(word)
-    print(wordGrouping)
+    #print(wordGrouping)
 
     return output
 
@@ -139,7 +139,7 @@ def procesing(ogImage):
 def process(imageName):
     output = ""
     img = cv2.imread(imageName)
-    if DEBUG: saveImage(img, "./output/inital")
+    if DEBUG: saveImage(img, "./output/initalImage")
     preprocessed = preprocess(img)
     output = procesing(preprocessed)
     return output
@@ -147,4 +147,4 @@ def process(imageName):
 
 if __name__ == "__main__":
     print(sys.argv[1])
-    print(process(sys.argv[1]))
+    out = process(sys.argv[1])
