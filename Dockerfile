@@ -17,25 +17,27 @@ RUN mkdir /main
 WORKDIR /main
 RUN mkdir ./client
 RUN mkdir ./server
+RUN mkdir ./images
+RUN mkdir ./staticImages
 
+COPY ./client/package.json ./client
+WORKDIR /main/client
+RUN npm install
+WORKDIR /main
 COPY ./client/public ./client/public
 COPY ./client/src ./client/src
 COPY ./client/.env ./client
-COPY ./client/package.json ./client
-
 COPY ./server ./server
-
+COPY ./images ./images
 COPY ./run.sh ./
 
 WORKDIR /main/client
 
-RUN npm install
+
 FROM base as baseContainer
 
 WORKDIR /main/client
-
-RUN ls && npm run build
-
+RUN npm run build
 
 
 

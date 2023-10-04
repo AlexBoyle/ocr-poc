@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import math
 import ocr
+import os
 pytesseract = None
 try:
     import pytesseract
@@ -16,8 +17,10 @@ MIN_COLOR_VALUE = 0
 DEBUG = True
 
 
-def saveImage(img, name, compression=100):
-    cv2.imwrite(name + ".webp", img, [cv2.IMWRITE_WEBP_QUALITY, compression])
+def saveImage(img, name, imageName, compression=100):
+    if not os.path.exists("../staticImages/" + imageName):
+        os.makedirs("../staticImages/" + imageName)
+    cv2.imwrite("../staticImages/" + imageName + "/" + name + ".webp", img, [cv2.IMWRITE_WEBP_QUALITY, compression])
 
 def crop(ogImage):
     image = ogImage.copy()
@@ -48,7 +51,6 @@ def cutOnBrightness(ogImage):
 
     a = cv2.drawContours(image=processedImage.copy(), contours=[contour], contourIdx=-1,
                          color=(MAX_COLOR_VALUE, MAX_COLOR_VALUE, MIN_COLOR_VALUE), thickness=1, lineType=cv2.LINE_AA)
-    #if DEBUG: saveImage(a, "./output/a")
     # Simplify bounding box
     peri = cv2.arcLength(contour, True)
     # contour = cv2.approxPolyDP(contour, .05* peri, True)
@@ -67,13 +69,13 @@ def cutOnBrightness(ogImage):
     return out
 
 
-def preprocess(ogImage):
+def preprocess(ogImage, imageName):
     image = ogImage.copy()
     # Add border
     image = cv2.copyMakeBorder(image, 1, 1, 1, 1, cv2.BORDER_CONSTANT, None,
                                [MIN_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE, MIN_COLOR_VALUE])
     cut = cutOnBrightness(image)
-    if DEBUG: saveImage(cut, "./output/cut")
+    if DEBUG: saveImage(cut, "cut", imageName)
     # Reduce noise
     out = cv2.cvtColor(cut, cv2.COLOR_BGR2GRAY)
     out = np.abs(np.subtract(out, 1))
@@ -82,12 +84,12 @@ def preprocess(ogImage):
     #cv2.floodFill(out, None, (0, 0), 0)
     #cv2.floodFill(out, None, (0, 0), 255)
     # out = remove_isolated_pixels(out)
-    if DEBUG: saveImage(out, "./output/preprocessedImage")
+    if DEBUG: saveImage(out, "preprocessedImage", imageName)
 
     return out
 
 
-def procesing(ogImage):
+def procesing(ogImage, ocrOptions, imageName):
     image = ogImage.copy()
     ogImageCopy = ogImage.copy()
 
@@ -95,7 +97,7 @@ def procesing(ogImage):
     rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 3))
     dilation = cv2.dilate(thresh1, rect_kernel, iterations=1)
     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if DEBUG: saveImage(dilation, "./output/dilation")
+    if DEBUG: saveImage(dilation, "dilation", imageName)
     # Creating a copy of image
     wordLocation = []
     for i, cnt in enumerate(contours):
@@ -105,14 +107,18 @@ def procesing(ogImage):
         rect = cv2.rectangle(ogImageCopy, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cropped = ogImage[y:y + h, x:x + w]
         cropped = crop(cropped)
-        cropped = cv2.resize(cropped, (0, 0), fx = 3, fy = 3)
         cropped = cv2.threshold(cropped, 125, MAX_COLOR_VALUE, cv2.THRESH_BINARY)[1]
-        ocrOutput = ocr.runTesseract(cropped)
+        cropped = cv2.resize(cropped, (0, 0), fx = 3, fy = 3)
+
+
+        cropped = cv2.GaussianBlur(cropped,(11,11),0)
+        cropped = cv2.medianBlur(cropped,9)
+        ocrOutput = ocr.runTesseract(cropped, ocrOptions)
         if ocrOutput == "": ocrOutput = str(i)
-        #saveImage(cropped, "./output/cropped-"+str(i))
+        if DEBUG: saveImage(cropped, "cropped-"+str(i), imageName)
         wordLocation.append([x, y, str(ocrOutput)])
     wordLocation = sorted(wordLocation, key=lambda x: x[1])
-    #if DEBUG: saveImage(ogImageCopy, "./output/ogImageCopy")
+    if DEBUG: saveImage(ogImageCopy, "ogImageCopy", imageName)
     diff = 0
     for i, word in enumerate(wordLocation):
         if i != 0:
@@ -136,15 +142,15 @@ def procesing(ogImage):
     return output
 
 
-def process(imageName):
+def process(imageName, name, ocrOptions):
     output = ""
     img = cv2.imread(imageName)
-    if DEBUG: saveImage(img, "./output/initalImage")
-    preprocessed = preprocess(img)
-    output = procesing(preprocessed)
+    if DEBUG: saveImage(img, "initalImage", name)
+    preprocessed = preprocess(img, name)
+    output = procesing(preprocessed, ocrOptions, name)
     return output
 
 
 if __name__ == "__main__":
     print(sys.argv[1])
-    out = process(sys.argv[1])
+    out = process(sys.argv[1], "Test", None)

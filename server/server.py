@@ -1,24 +1,34 @@
 import os.path
 
-from flask import Flask, Response
+from flask import Flask, Response, render_template,send_file
 import subprocess
-from src.server.server import proceser
+import proceser
 
-app = Flask(__name__, static_folder='/main/client/build')
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists(app.static_folder + '/' + path):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder='../client/build'
+)
+html_content=""
+with open('../client/build/index.html', 'r') as html_file:
+    html_content = html_file.read()
 
 
 @app.route('/check/<number>')
 def success(number):
-    output = proceser.process("./images/" + number + "-receipt.jpg")
-    return "<img style='width: 40%;' src=/static/final.webp/><img style='width: 40%;' src=/static/inital.webp/><pre>" + output + "</pre>"
+    output = proceser.process("../images/" + number + "-receipt.jpg", number, None)
+    return "<pre>" + output + "</pre>"
+
+@app.route('/list-debug-images/<string:runId>')
+def listDebugImages(runId):
+    return os.listdir('../staticImages/'+runId)
+@app.route('/debug-images/<string:runId>/<string:imageName>')
+def getDebugImages(runId, imageName):
+    return send_file('../staticImages/'+runId+'/'+ imageName, mimetype='image/webp')
+@app.route('/', defaults={'path': ""})
+@app.route('/<string:path>')
+def index_redir(path):
+    return html_content
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)

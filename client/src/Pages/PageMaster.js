@@ -1,9 +1,6 @@
-import ChatbotConfigurationPage from "./ChatbotConfigurationPage";
 import DashboardPage from "./DashboardPage";
-import DataManagementPage from "./DataManagementPage";
-import ServerManagementPage from "./ServerManagementPage";
-import SupportPage from "./SupportPage";
-import ChatbotConfigEditPage from "./ChatbotConfigEditPage";
+import TestOcrPage from "./TestOcrPage";
+
 import { FaHome, FaWrench, FaServer } from "react-icons/fa";
 import { BiSolidBot } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
@@ -16,32 +13,12 @@ function PageMaster() {
       url: "/",
       sidebar: true,
     },
-    ChatbotConfiguration: {
+    TestOcrPage: {
       icon: <BiSolidBot />,
-      name: "Chatbot Config",
-      page: <ChatbotConfigurationPage></ChatbotConfigurationPage>,
+      name: "TestOcrPage",
+      page: <TestOcrPage></TestOcrPage>,
       url: "/chat-config",
       sidebar: true,
-    },
-    DataManagement: {
-      icon: <BsServer />,
-      name: "Data Config",
-      page: <DataManagementPage></DataManagementPage>,
-      url: "/data-config",
-      sidebar: true,
-    },
-    ServerManagement: {
-      icon: <FaServer />,
-      name: "Server Config",
-      page: <ServerManagementPage></ServerManagementPage>,
-      url: "/server-config",
-      sidebar: true,
-    },
-    Test: {
-      name: "Chatbot Edit Page",
-      page: <ChatbotConfigEditPage></ChatbotConfigEditPage>,
-      url: "/chat-config/:id",
-      sidebar: false,
     },
   };
 }
